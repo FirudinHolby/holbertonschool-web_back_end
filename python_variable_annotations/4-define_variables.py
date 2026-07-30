@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""
-This module defines and annotates variables with specific types and values.
-"""
+'''STRING'''
+
 
 a: int = 1
 pi: float = 3.14

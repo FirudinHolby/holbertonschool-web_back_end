@@ -1,38 +1,26 @@
 #!/usr/bin/env python3
-'''
-manage the API authentification
-'''
+"""This file we use for create auth funct in our app"""
 from flask import request
 from typing import List, TypeVar
 
 
 class Auth:
-    """
-manage the API authentification
-"""
+    """We gonna use that class for auth goals"""
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        ''' require_authentification '''
-        if path is None:
+        """This funct is require the auth"""
+        if path is None or (excluded_paths is None or []):
             return True
-        if excluded_paths is None:
-            return True
-        if len(excluded_paths) == 0:
-            return True
-        if path is None or excluded_paths is None:
-            return True
-        path = path + '/' if path[-1] != '/' else path
-        if path in excluded_paths:
+        normalized_path = path if path.endswith('/') else path + '/'
+        if normalized_path in excluded_paths:
             return False
         return True
 
     def authorization_header(self, request=None) -> str:
-        """ authorization_header
-        """
-        if request is None or 'Authorization' not in request.headers:
+        """This funct is auto header"""
+        if request is None:
             return None
-        return request.headers['Authorization']
+        return request.headers.get('Authorization')
 
     def current_user(self, request=None) -> TypeVar('User'):
-        """ current_user
-        """
+        """This funct is checking current user"""
         return None

@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
-"""
-This module defines a function that returns the sum of a list of floats.
-"""
-
-from typing import List
+'''STRING'''
 
 
-def sum_list(input_list: List[float]) -> float:
-    """
-    Calculates the sum of a list of floats.
+import typing
 
-    Args:
-        input_list (List[float]): The list of floating-point numbers.
 
-    Returns:
-        float: The sum of the numbers in the list.
-    """
+def sum_list(input_list: typing.List[float]) -> float:
+    '''sum list'''
     return sum(input_list)

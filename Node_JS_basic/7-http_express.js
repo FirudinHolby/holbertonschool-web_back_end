@@ -1,49 +1,64 @@
 const express = require('express');
-const fs = require('fs');
-
-function getStudentsReport(path) {
-  return fs.promises.readFile(path, 'utf8')
-    .then((data) => {
-      const rows = data.split('\n').filter((line) => line.trim() !== '');
-      const students = rows.slice(1);
-      const byField = {};
-
-      students.forEach((student) => {
-        const [firstname, , , field] = student.split(',');
-        if (!byField[field]) {
-          byField[field] = [];
-        }
-        byField[field].push(firstname);
-      });
-
-      const lines = [`Number of students: ${students.length}`];
-      Object.keys(byField).forEach((field) => {
-        lines.push(`Number of students in ${field}: ${byField[field].length}. List: ${byField[field].join(', ')}`);
-      });
-      return lines.join('\n');
-    })
-    .catch(() => {
-      throw new Error('Cannot load the database');
-    });
-}
+const fs = require('node:fs/promises');
 
 const app = express();
+const port = 1245;
+const database = process.argv[2];
+
+async function countStudents(path) {
+  let data;
+
+  try {
+    data = await fs.readFile(path, 'utf8');
+  } catch (err) {
+    throw new Error('Cannot load the database');
+  }
+
+  const lines = data
+    .split('\n')
+    .filter((line) => line.trim() !== '');
+
+  const students = lines.slice(1);
+
+  const fields = {};
+
+  students.forEach((line) => {
+    const [firstname, , , field] = line.split(',');
+
+    if (!fields[field]) {
+      fields[field] = [];
+    }
+
+    fields[field].push(firstname);
+  });
+
+  let result = `Number of students: ${students.length}`;
+
+  Object.entries(fields).forEach(([field, list]) => {
+    result += `\nNumber of students in ${field}: ${list.length}. List: ${list.join(', ')}`;
+  });
+
+  return result;
+}
 
 app.get('/', (req, res) => {
-  res.status(200).type('text/plain').send('Hello Holberton School!');
+  res.send('Hello Holberton School!');
 });
 
-app.get('/students', (req, res) => {
-  const dbPath = process.argv[2];
-  getStudentsReport(dbPath)
-    .then((report) => {
-      res.status(200).type('text/plain').send(`This is the list of our students\n${report}`);
-    })
-    .catch((error) => {
-      res.status(200).type('text/plain').send(`This is the list of our students\n${error.message}`);
-    });
+app.get('/students', async (req, res) => {
+  try {
+    const studentsInfo = await countStudents(database);
+
+    res.send(
+      `This is the list of our students\n${studentsInfo}`,
+    );
+  } catch (err) {
+    res.send(
+      'This is the list of our students\nCannot load the database',
+    );
+  }
 });
 
-app.listen(1245);
+app.listen(port);
 
 module.exports = app;

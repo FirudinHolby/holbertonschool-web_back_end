@@ -1,34 +1,18 @@
 #!/usr/bin/env python3
-"""Web page cache and access tracker using Redis."""
-
-from functools import wraps
-from typing import Callable
-
-import redis
+'''Getting web page via get_page function'''
 import requests
-
-redis_client = redis.Redis()
-
-
-def count_url_access(method: Callable) -> Callable:
-    """Track URL accesses and cache fetched HTML for 10 seconds."""
-
-    @wraps(method)
-    def wrapper(url: str) -> str:
-        redis_client.incr(f"count:{url}")
-
-        cached = redis_client.get(f"cached:{url}")
-        if cached:
-            return cached.decode("utf-8")
-
-        html = method(url)
-        redis_client.setex(f"cached:{url}", 10, html)
-        return html
-
-    return wrapper
+import redis
 
 
-@count_url_access
+r = redis.Redis()
+
+
 def get_page(url: str) -> str:
-    """Fetch and return HTML content for a URL."""
-    return requests.get(url).text
+    '''Get Page and return its content while caching its value'''
+    r.incr(f"count:{url}")
+    cache = r.get(url)
+    if cache:
+        return cache.decode("utf-8")
+    resp = requests.get(url)
+    r.setex(url, 10, resp.text)
+    return resp.text

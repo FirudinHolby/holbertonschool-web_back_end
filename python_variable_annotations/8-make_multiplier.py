@@ -1,24 +1,13 @@
 #!/usr/bin/env python3
-"""
-This module defines a function that returns a function which multiplies
-a number by a specified multiplier.
-"""
-
-from typing import Callable
+'''STRING'''
 
 
-def make_multiplier(multiplier: float) -> Callable[[float], float]:
-    """
-    Returns a function that multiplies a float by the specified multiplier.
+import typing
 
-    Args:
-        multiplier (float): The multiplier for the multiplication.
 
-    Returns:
-        Callable[[float], float]: A function that takes a float and returns
-        the product of the float and the multiplier.
-    """
-    def multiplier_function(n: float) -> float:
-        return n * multiplier
-
-    return multiplier_function
+def make_multiplier(multiplier: float) -> typing.Callable[[float], float]:
+    '''make multiplier'''
+    def multiplier_func(number: float) -> float:
+        '''multiplier func'''
+        return number * multiplier
+    return multiplier_func

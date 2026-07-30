@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Flask app with user locale priority"""
+"""6-app.py"""
 from flask import Flask, render_template, request, g
 from flask_babel import Babel
+
+app = Flask(__name__)
 
 
 users = {
@@ -12,49 +14,56 @@ users = {
 }
 
 
-class Config:
-    """Configuration class for Flask app"""
-    LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_LOCALE = "en"
-    BABEL_DEFAULT_TIMEZONE = "UTC"
+class Config(object):
+    """Config class for Babel"""
+    LANGUAGES = ['en', 'fr']
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
+    BABEL_TRANSLATION_DIRECTORIES = 'translations'
 
 
-app = Flask(__name__)
 app.config.from_object(Config)
 
 
+def get_user():
+    """Get user from request"""
+    login_as = request.args.get('login_as')
+    if login_as is None:
+        return None
+    try:
+        return users.get(int(login_as))
+    except (ValueError, TypeError):
+        return None
+
+
+@app.before_request
+def before_request():
+    """Set user in g"""
+    g.user = get_user()
+
+
 def get_locale():
-    """Determine best match language based on priority order"""
-    locale = request.args.get("locale")
-    if locale in app.config["LANGUAGES"]:
+    """Determine the best match with our supported languages."""
+    locale = request.args.get('locale')
+    if locale in app.config['LANGUAGES']:
         return locale
-    if g.user and g.user.get("locale") in app.config["LANGUAGES"]:
-        return g.user.get("locale")
-    return request.accept_languages.best_match(app.config["LANGUAGES"])
+
+    if g.user:
+        user_locale = g.user.get('locale')
+        if user_locale in app.config['LANGUAGES']:
+            return user_locale
+
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 babel = Babel(app, locale_selector=get_locale)
 
 
-def get_user():
-    """Return user dictionary or None if not found"""
-    login_as = request.args.get("login_as")
-    if login_as is None:
-        return None
-    return users.get(int(login_as))
-
-
-@app.before_request
-def before_request():
-    """Execute before all other functions"""
-    g.user = get_user()
-
-
-@app.route("/")
+@app.route('/')
 def index():
-    """Home page route"""
-    return render_template("6-index.html")
+    """Render the index template"""
+    return render_template('6-index.html')
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run()

@@ -1,35 +1,48 @@
 const http = require('http');
-const fs = require('fs');
+const fs = require('fs').promises;
 
-function getStudentsReport(path) {
-  return fs.promises.readFile(path, 'utf8')
-    .then((data) => {
-      const rows = data.split('\n').filter((line) => line.trim() !== '');
-      const students = rows.slice(1);
-      const byField = {};
+const database = process.argv[2];
 
-      students.forEach((student) => {
-        const [firstname, , , field] = student.split(',');
-        if (!byField[field]) {
-          byField[field] = [];
-        }
-        byField[field].push(firstname);
-      });
+async function countStudents(path) {
+  let data;
 
-      const lines = [`Number of students: ${students.length}`];
-      Object.keys(byField).forEach((field) => {
-        lines.push(`Number of students in ${field}: ${byField[field].length}. List: ${byField[field].join(', ')}`);
-      });
-      return lines.join('\n');
-    })
-    .catch(() => {
-      throw new Error('Cannot load the database');
-    });
+  try {
+    data = await fs.readFile(path, 'utf8');
+  } catch (err) {
+    throw new Error('Cannot load the database');
+  }
+
+  const lines = data
+    .split('\n')
+    .filter((line) => line.trim() !== '');
+
+  const students = lines.slice(1);
+
+  const fields = {};
+
+  students.forEach((line) => {
+    const [firstname, , , field] = line.split(',');
+
+    if (!fields[field]) {
+      fields[field] = [];
+    }
+
+    fields[field].push(firstname);
+  });
+
+  let result = `Number of students: ${students.length}`;
+
+  Object.entries(fields).forEach(([field, list]) => {
+    result += `\nNumber of students in ${field}: ${list.length}. List: ${list.join(', ')}`;
+  });
+
+  return result;
 }
 
-const app = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
+const app = http.createServer(async (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/plain',
+  });
 
   if (req.url === '/') {
     res.end('Hello Holberton School!');
@@ -37,18 +50,21 @@ const app = http.createServer((req, res) => {
   }
 
   if (req.url === '/students') {
-    const dbPath = process.argv[2];
-    getStudentsReport(dbPath)
-      .then((report) => {
-        res.end(`This is the list of our students\n${report}`);
-      })
-      .catch((error) => {
-        res.end(`This is the list of our students\n${error.message}`);
-      });
+    try {
+      const studentsInfo = await countStudents(database);
+
+      res.end(
+        `This is the list of our students\n${studentsInfo}`,
+      );
+    } catch (err) {
+      res.end(
+        'This is the list of our students\nCannot load the database',
+      );
+    }
     return;
   }
 
-  res.end('Hello Holberton School!');
+  res.end();
 });
 
 app.listen(1245);
