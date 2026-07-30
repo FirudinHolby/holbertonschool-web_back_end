@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""pagination"""
+"""
+Simple helper function
+"""
+from typing import Tuple
 
 
-def index_range(page=1, page_size=10):
-    """useing pagination"""
+def indef_range(page: int, page_size: int) -> Tuple[int, int]:
+    """Returns page numbers to display in pagination."""
     start = (page - 1) * page_size
-    end = start + page_size
-    return start, end
+    end = page * page_size
+    return (start, end)

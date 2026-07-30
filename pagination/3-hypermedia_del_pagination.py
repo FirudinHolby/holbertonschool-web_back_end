@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""pagination"""
+"""
+Deletion-resilient hypermedia pagination
+"""
 
 import csv
-from typing import List, Dict, Union
+import math
+from typing import List, Dict
 
 
 class Server:
-    """Server baby names"""
+    """Server class to paginate a database of popular baby names.
+    """
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
@@ -25,7 +29,8 @@ class Server:
         return self.__dataset
 
     def indexed_dataset(self) -> Dict[int, List]:
-        """datasets"""
+        """Dataset indexed by sorting position, starting at 0
+        """
         if self.__indexed_dataset is None:
             dataset = self.dataset()
             truncated_dataset = dataset[:1000]
@@ -34,30 +39,34 @@ class Server:
             }
         return self.__indexed_dataset
 
-    b = Dict[int, object]
-
-    def get_hyper_index(self, index: int = None, page_size: int = 10) -> b:
+    def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
         """
-        We use this method for give some information about this stuff
+        Returns a dictionary containing the following key-value pairs:
+            index: the current start index of the return page. That is
+            the index of the first item in the current page.
+            next_index: the next index to query with. That should be
+            the index of the first item in the next page. None if there
+            is no next page.
+            page_size: the current page size
+            data: the dataset page (equivalent to return from get_page)
         """
-        assert index is not None and index >= 0
+        assert isinstance(index, int) and index >= 0
         assert isinstance(page_size, int) and page_size > 0
 
-        all_data = self.indexed_dataset()
-        assert index < len(all_data)
-
+        indexed_data = self.indexed_dataset()
         data = []
-        current_idx = index
+        next_index = index
 
-        while len(data) < page_size and current_idx < len(all_data):
-            item = all_data.get(current_idx)
-            if item:
-                data.append(item)
-            current_idx += 1
+        for _ in range(page_size):
+            if next_index in indexed_data:
+                data.append(indexed_data[next_index])
+                next_index += 1
+            else:
+                break
 
-        next_index = current_idx if current_idx < len(all_data) else None
-
-        return {'index': index,
-                'data': data,
-                'page_size': len(data),
-                'next_index': next_index}
+        return {
+            "index": index,
+            "next_index": next_index if next_index < len(indexed_data) else None,
+            "page_size": len(data),
+            "data": data
+        }

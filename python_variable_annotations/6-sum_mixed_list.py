@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-'''STRING'''
+"sjnfdsd"
+from typing import List, Union
 
 
-import typing
-
-
-def sum_mixed_list(mxd_lst: typing.List[typing.Union[int, float]]) -> float:
-    '''sum mixed list'''
-    return sum(mxd_lst)
+def sum_mixed_list(mxd_lst: List[Union[int, float]]) -> float:
+    "fsdfs"
+    res = 0
+    for i in mxd_lst:
+        res += i
+    return res

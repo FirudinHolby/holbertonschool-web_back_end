@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
-'''STRING'''
+"sjnfdsd"
+from typing import Iterable, Sequence, Tuple, List
 
 
-import typing
-
-
-def element_length(lst: typing.Iterable[typing.Sequence]) \
-        -> typing.List[typing.Tuple[typing.Sequence, int]]:
-    '''
-    Docstring for element_length
-    :param lst: Description
-    :type lst: typing.Iterable[typing.Sequence]
-    :return: Description
-    :rtype: List[Tuple[Sequence, int]]
-    '''
+def element_length(lst: Iterable[Sequence]) -> List[Tuple[Sequence, int]]:
+    "dfgsdfg"
     return [(i, len(i)) for i in lst]

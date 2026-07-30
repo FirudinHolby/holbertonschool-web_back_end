@@ -1,31 +1,36 @@
-const fs = require('node:fs/promises');
+import fs from 'fs';
 
-function readDatabase(path) {
-  return fs.readFile(path, 'utf-8')
-    .then((data) => {
-      const lines = data
-        .split('\n')
-        .filter((line) => line.trim() !== '');
-
-      const students = lines.slice(1);
-
-      const fields = {};
-
-      for (const line of students) {
-        const [firstname, , , field] = line.split(',');
-
-        if (!fields[field]) {
-          fields[field] = [];
-        }
-
-        fields[field].push(firstname);
+export default function readDatabase(path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf-8', (err, data) => {
+      if (err) {
+        reject(new Error('Cannot load the database'));
+        return;
       }
 
-      return fields;
-    })
-    .catch(() => {
-      throw new Error('Cannot load the database');
-    });
-}
+      const lines = data.split(/\r?\n/).filter((line) => line.trim() !== '');
+      if (lines.length <= 1) {
+        resolve({});
+        return;
+      }
 
-module.exports = readDatabase;
+      const headers = lines[0].split(',');
+      const studentLines = lines.slice(1);
+      const fields = {};
+
+      for (const line of studentLines) {
+        const studentData = line.split(',');
+        if (studentData.length === headers.length) {
+          const firstName = studentData[0].trim();
+          const field = studentData[studentData.length - 1].trim();
+
+          if (!fields[field]) {
+            fields[field] = [];
+          }
+          fields[field].push(firstName);
+        }
+      }
+      resolve(fields);
+    });
+  });
+}

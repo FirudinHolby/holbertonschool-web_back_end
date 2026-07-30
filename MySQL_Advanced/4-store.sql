@@ -1,7 +1,6 @@
--- SQL
+-- Create a table named `store` with the following columns:
 DELIMITER $$
-
-CREATE TRIGGER decrease_item_quantity
+CREATE TRIGGER after_adding_items
 AFTER INSERT ON orders
 FOR EACH ROW
 BEGIN
@@ -9,5 +8,4 @@ BEGIN
     SET quantity = quantity - NEW.number
     WHERE name = NEW.item_name;
 END$$
-
 DELIMITER ;

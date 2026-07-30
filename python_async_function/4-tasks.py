@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
-'''New function'''
+"sdfsdfds"
 
 
-import typing
 import asyncio
+from typing import List
+wait_random = __import__('0-basic_async_syntax').wait_random
 task_wait_random = __import__('3-tasks').task_wait_random
 
 
-async def task_wait_n(n: int, max_delay: int) -> typing.List[float]:
-    '''DEF wait_n'''
-    tasks = [task_wait_random(max_delay) for i in range(n)]
-    delays = await asyncio.gather(*tasks)
-    result = []
-    for delay in delays:
-        inserted = False
-        for j in range(len(result)):
-            if delay < result[j]:
-                result.insert(j, delay)
-                inserted = True
-                break
-        if not inserted:
-            result.append(delay)
-    return result
+async def task_wait_n(n: int, max_delay: int) -> List[float]:
+    """sdfds"""
+    tasks = [task_wait_random(max_delay) for _ in range(n)]
+
+    delays = []
+    for completed in asyncio.as_completed(tasks):
+        res = await completed
+        delays.append(res)
+
+    return delays

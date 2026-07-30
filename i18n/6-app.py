@@ -1,69 +1,75 @@
 #!/usr/bin/env python3
-"""6-app.py"""
-from flask import Flask, render_template, request, g
+"""
+This module is for Babel object instantiation
+"""
+from flask import Flask, request, render_template, g
 from flask_babel import Babel
 
-app = Flask(__name__)
+
+class Config:
+    """
+    This class is for configuring the languages
+    """
+    LANGUAGES = ["en", "fr"]
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
 
 
 users = {
     1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
     2: {"name": "Beyonce", "locale": "en", "timezone": "US/Central"},
-    3: {"name": "Spock", "locale": "kg", "timezone": "Vulcan"},
+    3: {"name": "Spock", "locale": "kg", "timezone": "Vulkan"},
     4: {"name": "Teletubby", "locale": None, "timezone": "Europe/London"},
 }
 
 
-class Config(object):
-    """Config class for Babel"""
-    LANGUAGES = ['en', 'fr']
-    BABEL_DEFAULT_LOCALE = 'en'
-    BABEL_DEFAULT_TIMEZONE = 'UTC'
-    BABEL_TRANSLATION_DIRECTORIES = 'translations'
+def get_locale():
+    """
+    Determines the best match for supported languages
+    """
+    if request.args.get('locale') in app.config['LANGUAGES']:
+        return request.args.get('locale')
+    elif g.user:
+        locale = g.user.get('locale')
+        if locale in app.config['LANGUAGES']:
+            return locale
+    elif request.headers.get('locale'):
+        return request.headers.get('locale')
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
-app.config.from_object(Config)
-
-
-def get_user():
-    """Get user from request"""
-    login_as = request.args.get('login_as')
+def get_user(login_as):
+    """
+    Returns a user dictionary or None if the ID cannot be found
+    """
     if login_as is None:
         return None
-    try:
-        return users.get(int(login_as))
-    except (ValueError, TypeError):
+    if login_as not in users:
         return None
+    return users.get(login_as)
+
+
+app = Flask(__name__)
+app.config.from_object(Config)
+babel = Babel(app, locale_selector=get_locale)
 
 
 @app.before_request
 def before_request():
-    """Set user in g"""
-    g.user = get_user()
-
-
-def get_locale():
-    """Determine the best match with our supported languages."""
-    locale = request.args.get('locale')
-    if locale in app.config['LANGUAGES']:
-        return locale
-
-    if g.user:
-        user_locale = g.user.get('locale')
-        if user_locale in app.config['LANGUAGES']:
-            return user_locale
-
-    return request.accept_languages.best_match(app.config['LANGUAGES'])
-
-
-babel = Babel(app, locale_selector=get_locale)
+    """
+    Finds a user if any, and sets it as a global on flask.g.user
+    """
+    login_as = request.args.get('login_as', type=int)
+    g.user = get_user(login_as)
 
 
 @app.route('/')
-def index():
-    """Render the index template"""
+def home():
+    """
+    Renders the template
+    """
     return render_template('6-index.html')
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=5000, debug=True)

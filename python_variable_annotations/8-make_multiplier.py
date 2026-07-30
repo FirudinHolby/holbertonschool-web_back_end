@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-'''STRING'''
+"sjnfdsd"
+from typing import Callable
 
 
-import typing
-
-
-def make_multiplier(multiplier: float) -> typing.Callable[[float], float]:
-    '''make multiplier'''
-    def multiplier_func(number: float) -> float:
-        '''multiplier func'''
-        return number * multiplier
-    return multiplier_func
+def make_multiplier(multiplier: float) -> Callable[[float], float]:
+    "sdfsfds"
+    def multiplier_function(x: float) -> float:
+        "dsfsdfds"
+        return x * multiplier
+    return multiplier_function

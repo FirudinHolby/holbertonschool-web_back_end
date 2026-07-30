@@ -1,13 +1,11 @@
--- SQL
+-- sdfsd
 DELIMITER $$
-
-CREATE TRIGGER reset_valid_email
-BEFORE UPDATE ON users
+CREATE TRIGGER valid_email_resetter
+BEFORE INSERT ON users
 FOR EACH ROW
 BEGIN
-    IF OLD.email != NEW.email THEN
+    IF NEW.email <> OLD.email THEN
         SET NEW.valid_email = 0;
     END IF;
-END$$
-
+END $$
 DELIMITER ;

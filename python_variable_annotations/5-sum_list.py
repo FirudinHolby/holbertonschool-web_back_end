@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-'''STRING'''
+"sjnfdsd"
+from typing import List
 
 
-import typing
-
-
-def sum_list(input_list: typing.List[float]) -> float:
-    '''sum list'''
-    return sum(input_list)
+def sum_list(input_list: List[float]) -> float:
+    "fsdfs"
+    res = 0
+    for i in input_list:
+        res += i
+    return res

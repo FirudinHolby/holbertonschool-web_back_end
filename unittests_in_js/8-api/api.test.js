@@ -1,20 +1,19 @@
-const app = require("./api");
-const { expect } = require("chai");
-const request = require("request");
+const request = require('request');
+const { expect } = require('chai');
 
-describe("Route test for index page", () => {
-  it("returns correct status code", (done) => {
-    request("http://localhost:7865", (err, res, body) => {
-      expect(res.statusCode).to.equal(200);
+describe('API integration tests', () => {
+  const URL = 'http://localhost:7865'; // 🔑 This declaration must be present
 
+  it('Correct status code?', (done) => {
+    request(URL, (error, response, body) => {
+      expect(response.statusCode).to.equal(200);
       done();
     });
   });
 
-  it("returns correct response body", (done) => {
-    request("http://localhost:7865", (err, res, body) => {
-      expect(body).to.equal("Welcome to the payment system");
-
+  it('Correct result?', (done) => {
+    request(URL, (error, response, body) => {
+      expect(body).to.equal('Welcome to the payment system');
       done();
     });
   });

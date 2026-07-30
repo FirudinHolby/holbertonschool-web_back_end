@@ -1,9 +1,10 @@
-const express = require('express');
-const routes = require('./routes/index');
+import express from 'express';
+import router from './routes/index';
 
 const app = express();
 
-app.use('/', routes);
+// Yaratdığımız route strukturunu istifadə edirik
+app.use('/', router);
 
 app.listen(1245);
 

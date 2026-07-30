@@ -1,14 +1,15 @@
 const express = require('express');
 
+// Express tətbiqini başladırıq
 const app = express();
-const port = 1245;
 
+// Sırf ana səhifə (/) üçün GET sorğusunu qarşılayırıq
 app.get('/', (req, res) => {
   res.send('Hello Holberton School!');
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+// Serverin 1245-ci portu dinləməsini təmin edirik
+app.listen(1245);
 
+// "app" dəyişənini eksport edirik
 module.exports = app;
