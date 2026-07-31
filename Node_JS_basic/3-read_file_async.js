@@ -2,51 +2,35 @@ const fs = require('fs');
 
 function countStudents(path) {
   return new Promise((resolve, reject) => {
-    // Faylı asinxron şəkildə oxuyuruq
     fs.readFile(path, 'utf-8', (err, data) => {
       if (err) {
-        // Fayl tapılmadıqda və ya oxunmadıqda Promise reject olunur
         reject(new Error('Cannot load the database'));
         return;
       }
 
-      // Sətirlərə bölürük və boş sətirləri təmizləyirik
-      const lines = data.split(/\r?\n/).filter((line) => line.trim() !== '');
-
-      // Əgər faylda tələbə yoxdursa (boşdursa və ya yalnız başlıq sətri varsa)
-      if (lines.length <= 1) {
-        console.log('Number of students: 0');
-        resolve();
-        return;
-      }
-
-      const headers = lines[0].split(',');
-      const studentLines = lines.slice(1);
-
-      console.log(`Number of students: ${studentLines.length}`);
+      const lines = data.split('\n').filter((line) => line.trim() !== '');
+      const students = lines.slice(1);
 
       const fields = {};
 
-      for (const line of studentLines) {
-        const studentData = line.split(',');
+      students.forEach((line) => {
+        const parts = line.split(',');
+        const firstname = parts[0];
+        const field = parts[parts.length - 1];
 
-        if (studentData.length === headers.length) {
-          const firstName = studentData[0].trim();
-          const field = studentData[studentData.length - 1].trim();
-
-          if (!fields[field]) {
-            fields[field] = [];
-          }
-          fields[field].push(firstName);
+        if (!fields[field]) {
+          fields[field] = [];
         }
-      }
+        fields[field].push(firstname);
+      });
 
-      // Hər bir sahə üzrə tələbələri konsola yazdırırıq
-      for (const [field, names] of Object.entries(fields)) {
-        console.log(`Number of students in ${field}: ${names.length}. List: ${names.join(', ')}`);
-      }
+      console.log(`Number of students: ${students.length}`);
 
-      // Hər şey uğurla tamamlandıqda Promise-i resolve edirik
+      Object.keys(fields).forEach((field) => {
+        const list = fields[field];
+        console.log(`Number of students in ${field}: ${list.length}. List: ${list.join(', ')}`);
+      });
+
       resolve();
     });
   });

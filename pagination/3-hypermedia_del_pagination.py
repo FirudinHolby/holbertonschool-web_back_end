@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Deletion-resilient hypermedia pagination
-"""
+'''Deletion-resilient hypermedia pagination'''
 
 import csv
 import math
@@ -9,8 +7,7 @@ from typing import List, Dict
 
 
 class Server:
-    """Server class to paginate a database of popular baby names.
-    """
+    '''Server class to paginate a database of popular baby names.'''
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
@@ -18,8 +15,7 @@ class Server:
         self.__indexed_dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset
-        """
+        '''Cached dataset'''
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
@@ -29,8 +25,7 @@ class Server:
         return self.__dataset
 
     def indexed_dataset(self) -> Dict[int, List]:
-        """Dataset indexed by sorting position, starting at 0
-        """
+        '''Dataset indexed by sorting position, starting at 0'''
         if self.__indexed_dataset is None:
             dataset = self.dataset()
             truncated_dataset = dataset[:1000]
@@ -40,33 +35,28 @@ class Server:
         return self.__indexed_dataset
 
     def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
-        """
-        Returns a dictionary containing the following key-value pairs:
-            index: the current start index of the return page. That is
-            the index of the first item in the current page.
-            next_index: the next index to query with. That should be
-            the index of the first item in the next page. None if there
-            is no next page.
-            page_size: the current page size
-            data: the dataset page (equivalent to return from get_page)
-        """
-        assert isinstance(index, int) and index >= 0
-        assert isinstance(page_size, int) and page_size > 0
+        '''Delete-resilient hypermedia pagination'''
+        indexed_dataset = self.indexed_dataset()
 
-        indexed_data = self.indexed_dataset()
-        data = []
-        next_index = index
+        assert (
+            index is not None
+            and
+            index >= 0
+            and
+            index < len(indexed_dataset))
 
-        for _ in range(page_size):
-            if next_index in indexed_data:
-                data.append(indexed_data[next_index])
-                next_index += 1
+        data_list = []
+        for i in range(index, index + page_size):
+            if i in indexed_dataset:
+                data_list.append(indexed_dataset[i])
             else:
-                break
+                index += 1
 
-        return {
-            "index": index,
-            "next_index": next_index if next_index < len(indexed_data) else None,
-            "page_size": len(data),
-            "data": data
+        res_dict = {
+            'index': index,
+            'data': data_list,
+            'page_size': page_size,
+            'next_index': index + page_size
         }
+
+        return res_dict

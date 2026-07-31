@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-"sjnfdsd"
+"""Module for creating a multiplier function."""
 from typing import Callable
 
 
 def make_multiplier(multiplier: float) -> Callable[[float], float]:
-    "sdfsfds"
-    def multiplier_function(x: float) -> float:
-        "dsfsdfds"
-        return x * multiplier
-    return multiplier_function
+    """Returns a function that multiplies a float by multiplier."""
+    return lambda x: x * multiplier

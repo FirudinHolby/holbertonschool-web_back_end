@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"sdfsdfds"
-
-
+"""Module for asynchronous coroutine that waits for a random delay."""
 import asyncio
 import random
 
 
 async def wait_random(max_delay: int = 10) -> float:
-    "sdfsdfds"
-    rand = random.uniform(0, max_delay)
-    await asyncio.sleep(rand)
-    return rand
+    """Asynchronous coroutine that waits for a random delay between 0 and
+
+    max_delay (included) seconds and eventually returns it.
+    """
+    delay = random.uniform(0, max_delay)
+    await asyncio.sleep(delay)
+    return delay

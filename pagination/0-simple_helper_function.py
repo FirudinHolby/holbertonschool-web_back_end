@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
-"""
-Simple helper function
-"""
-from typing import Tuple
+'''module for index_range function.'''
 
 
-def indef_range(page: int, page_size: int) -> Tuple[int, int]:
-    """Returns page numbers to display in pagination."""
-    start = (page - 1) * page_size
-    end = page * page_size
-    return (start, end)
+def index_range(page, page_size):
+    """Returns a tuple of size two containing a start index and an end index
+    corresponding to the range of indexes to return in a list for those
+    particular pagination parameters.
+
+    Args:
+        page (int): The current page number (1-indexed).
+        page_size (int): The number of items per page.
+
+    Returns:
+        tuple: A tuple containing the start index and end index.
+    """
+    start_index = (page - 1) * page_size
+    end_index = start_index + page_size
+    return (start_index, end_index)

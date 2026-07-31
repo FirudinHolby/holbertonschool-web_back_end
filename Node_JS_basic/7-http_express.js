@@ -1,11 +1,9 @@
 const express = require('express');
 const fs = require('fs');
 
-const app = express();
 const DB_FILE = process.argv[2];
 
-// Tələbə məlumatlarını asinxron oxuyub string kimi qaytaran köməkçi funksiya
-function getStudentsReport(path) {
+function countStudents(path) {
   return new Promise((resolve, reject) => {
     fs.readFile(path, 'utf-8', (err, data) => {
       if (err) {
@@ -13,59 +11,48 @@ function getStudentsReport(path) {
         return;
       }
 
-      const lines = data.split(/\r?\n/).filter((line) => line.trim() !== '');
-      if (lines.length <= 1) {
-        resolve('Number of students: 0');
-        return;
-      }
-
-      const headers = lines[0].split(',');
-      const studentLines = lines.slice(1);
-
-      // Cavab mətnini sətir-sətir yığmaq üçün massiv yaradırıq
-      let output = `Number of students: ${studentLines.length}`;
+      const lines = data.split('\n').filter((line) => line.trim() !== '');
+      const students = lines.slice(1);
 
       const fields = {};
-      for (const line of studentLines) {
-        const studentData = line.split(',');
-        if (studentData.length === headers.length) {
-          const firstName = studentData[0].trim();
-          const field = studentData[studentData.length - 1].trim();
 
-          if (!fields[field]) {
-            fields[field] = [];
-          }
-          fields[field].push(firstName);
+      students.forEach((line) => {
+        const parts = line.split(',');
+        const firstname = parts[0];
+        const field = parts[parts.length - 1];
+
+        if (!fields[field]) {
+          fields[field] = [];
         }
-      }
+        fields[field].push(firstname);
+      });
 
-      for (const [field, names] of Object.entries(fields)) {
-        output += `\nNumber of students in ${field}: ${names.length}. List: ${names.join(', ')}`;
-      }
+      const output = [];
+      output.push(`Number of students: ${students.length}`);
 
-      resolve(output);
+      Object.keys(fields).forEach((field) => {
+        const list = fields[field];
+        output.push(`Number of students in ${field}: ${list.length}. List: ${list.join(', ')}`);
+      });
+
+      resolve(output.join('\n'));
     });
   });
 }
 
-// Ana səhifə yönləndirməsi (/)
+const app = express();
+
 app.get('/', (req, res) => {
-  res.set('Content-Type', 'text/plain');
   res.send('Hello Holberton School!');
 });
 
-// Tələbələr səhifəsi yönləndirməsi (/students)
 app.get('/students', (req, res) => {
-  res.set('Content-Type', 'text/plain');
-
-  getStudentsReport(DB_FILE)
+  countStudents(DB_FILE)
     .then((report) => {
-      // Uğurlu olduqda mətni birləşdirib göndəririk
       res.send(`This is the list of our students\n${report}`);
     })
-    .catch(() => {
-      // Xəta baş verdikdə tələb olunan mətni qaytarırıq
-      res.send('This is the list of our students\nCannot load the database');
+    .catch((err) => {
+      res.send(`This is the list of our students\n${err.message}`);
     });
 });
 
