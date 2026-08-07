@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""Module for creating a multiplier function."""
-from typing import Callable
+'''STRING'''
 
 
-def make_multiplier(multiplier: float) -> Callable[[float], float]:
-    """Returns a function that multiplies a float by multiplier."""
-    return lambda x: x * multiplier
+import typing
+
+
+def make_multiplier(multiplier: float) -> typing.Callable[[float], float]:
+    '''make multiplier'''
+    def multiplier_func(number: float) -> float:
+        '''multiplier func'''
+        return number * multiplier
+    return multiplier_func

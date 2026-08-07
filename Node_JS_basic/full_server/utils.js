@@ -1,30 +1,31 @@
-const fs = require('fs');
+const fs = require('node:fs/promises');
 
-const readDatabase = (path) => new Promise((resolve, reject) => {
-  fs.readFile(path, 'utf-8', (err, data) => {
-    if (err) {
-      reject(err);
-      return;
-    }
+function readDatabase(path) {
+  return fs.readFile(path, 'utf-8')
+    .then((data) => {
+      const lines = data
+        .split('\n')
+        .filter((line) => line.trim() !== '');
 
-    const lines = data.split('\n').filter((line) => line.trim() !== '');
-    const students = lines.slice(1);
+      const students = lines.slice(1);
 
-    const fields = {};
+      const fields = {};
 
-    students.forEach((line) => {
-      const parts = line.split(',');
-      const firstname = parts[0];
-      const field = parts[parts.length - 1];
+      for (const line of students) {
+        const [firstname, , , field] = line.split(',');
 
-      if (!fields[field]) {
-        fields[field] = [];
+        if (!fields[field]) {
+          fields[field] = [];
+        }
+
+        fields[field].push(firstname);
       }
-      fields[field].push(firstname);
-    });
 
-    resolve(fields);
-  });
-});
+      return fields;
+    })
+    .catch(() => {
+      throw new Error('Cannot load the database');
+    });
+}
 
 module.exports = readDatabase;

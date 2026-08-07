@@ -1,15 +1,7 @@
 #!/usr/bin/env python3
-"""Simple string utilities using variable annotations."""
+'''STRING'''
 
 
-def concat(a: str, b: str) -> str:
-    """Return the concatenation of two strings.
-
-    Args:
-        a (str): The first string.
-        b (str): The second string.
-
-    Returns:
-        str: The concatenated string.
-    """
-    return a + b
+def concat(str1: str, str2: str) -> str:
+    '''Return the concatenation of str1 and str2'''
+    return str1 + str2

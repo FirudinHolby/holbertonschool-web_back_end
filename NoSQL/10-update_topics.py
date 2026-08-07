@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Changes all topics"""
+'''List all documents in collection'''
+
+
 def update_topics(mongo_collection, name, topics):
-    """Changes all topics of a school documnet"""
-    return mongo_collection.update_many(
-        {"name": name},
-        {"$set": {"topics": topics}}
-    )
+    '''Update'''
+    result = mongo_collection.update_many({'name': name}, {'$set': {'topics': topics}})
+    return result

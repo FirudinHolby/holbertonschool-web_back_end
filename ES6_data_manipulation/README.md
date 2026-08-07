@@ -1,4 +1,1 @@
-README
-IS
-NOT
-EMPTY
+# ES6 data manipulation

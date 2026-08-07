@@ -1,2 +1,2 @@
-// number of documents
-db.school.count();
+// Count
+db.school.count()

@@ -1,22 +1,44 @@
+// HolbertonClass Class
+
+/**
+ * Build initial class
+ *
+ * @class HolbertonClass
+ */
 export default class HolbertonClass {
-  constructor(size, location) {
-    this._size = size;
-    this._location = location;
+  constructor(size = '', location = '') {
+    this.size = size;
+    this.location = location;
+  }
+
+  [Symbol.toPrimitive](dataType) {
+    if (dataType === 'string') {
+      return (`${this.location}`);
+    } if (dataType === 'number') {
+      return (`${this.size}`);
+    }
+    return (`${this.location}`);
   }
 
   get size() {
     return this._size;
   }
 
-  get location() {
-    return this._location;
+  set size(value) {
+    if (typeof value !== 'number') {
+      throw new TypeError('size must be a number');
+    }
+    this._size = value;
   }
 
-  [Symbol.toPrimitive](hint) {
-    if (hint === 'number') {
-      return this._size;
-    }
+  get location() {
+    return this._code;
+  }
 
-    return this._location;
+  set location(value) {
+    if (typeof value !== 'string') {
+      throw new TypeError('size must be a string');
+    }
+    this._code = value;
   }
 }

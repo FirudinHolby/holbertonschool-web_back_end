@@ -1,3 +1,5 @@
+// Symbol Species
+
 export default class Car {
   constructor(brand, motor, color) {
     this._brand = brand;
@@ -10,7 +12,7 @@ export default class Car {
   }
 
   cloneCar() {
-    const Species = this.constructor[Symbol.species];
-    return new Species();
+    const ModelCar = this.constructor[Symbol.species];
+    return new ModelCar();
   }
 }
